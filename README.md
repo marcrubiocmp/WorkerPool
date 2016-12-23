@@ -1,10 +1,7 @@
 WorkerPool 
 ==========
 
-[![Build Status](https://travis-ci.org/qxsch/WorkerPool.svg?branch=master)](https://travis-ci.org/qxsch/WorkerPool)
-![Project Status](http://stillmaintained.com/qxsch/WorkerPool.png)
-
-[![Latest Stable Version](https://poser.pugx.org/qxsch/worker-pool/v/stable.png)](https://packagist.org/packages/qxsch/worker-pool) [![Total Downloads](https://poser.pugx.org/qxsch/worker-pool/downloads.png)](https://packagist.org/packages/qxsch/worker-pool) [![License](https://poser.pugx.org/qxsch/worker-pool/license.png)](https://packagist.org/packages/qxsch/worker-pool)
+[![Build Status](https://travis-ci.org/marcrubiocmp/WorkerPool.svg?branch=v1.4)](https://travis-ci.org/marcrubiocmp/WorkerPool)
 
 **Parallel Processing WorkerPool for PHP**
 
@@ -26,10 +23,9 @@ $wp->setWorkerPoolSize(4)
    ->create(new \QXS\WorkerPool\ClosureWorker(
                         /**
                           * @param mixed $input the input from the WorkerPool::run() Method
-                          * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to synchronize calls accross all workers
                           * @param \ArrayObject $storage a persistent storage for the current child process
                           */
-                        function($input, $semaphore, $storage) {
+                        function($input, $storage) {
                                 echo "[".getmypid()."]"." hi $input\n";
                                 sleep(rand(1,3)); // this is the working load!
                                 return $input; // return null here, in case you do not want to pass any data to the parent 
@@ -57,23 +53,17 @@ foreach($wp as $val) {
 
 use QXS\WorkerPool\WorkerPool;
 use QXS\WorkerPool\Worker;
-use QXS\WorkerPool\Semaphore;
-
 
 /**
  * Our Worker Class
  */
 Class MyWorker implements Worker {
-        protected $sem;
         /**
          * after the worker has been forked into another process
          *
-         * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to run synchronized tasks
          * @throws \Exception in case of a processing Error an Exception will be thrown
          */
-        public function onProcessCreate(Semaphore $semaphore) {
-                // semaphore can be used in the run method to synchronize the workers
-                $this->sem=$semaphore;
+        public function onProcessCreate() {
                 // write something to the stdout
                 echo "\t[".getmypid()."] has been created.\n";
                 // initialize mt_rand

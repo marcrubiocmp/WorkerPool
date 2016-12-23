@@ -22,7 +22,7 @@ $wp->setWorkerPoolSize(4)
 
 echo "starting closure 1..\n";
 $wp->run(new SerializableWorkerClosure(
-	function($input, $semaphore, $storage) {
+	function($input, $storage) {
 		sleep(2);
 		echo "$input: Hi $input\n";
 	},
@@ -32,7 +32,7 @@ $wp->run(new SerializableWorkerClosure(
 echo "starting closure 2..\n";
 $z="hello";
 $wp->run(new SerializableWorkerClosure(
-	function($input, $semaphore, $storage) use ($z) {
+	function($input, $storage) use ($z) {
 		sleep(2);
 		echo "$input: $z $input\n";
 	},
@@ -41,7 +41,7 @@ $wp->run(new SerializableWorkerClosure(
 
 echo "starting closure 3..\n";
 $wp->run(new SerializableWorkerClosure(
-	function($input, $semaphore, $storage) use ($z) {
+	function($input, $storage) use ($z) {
 		sleep(2);
 		echo "$input: $z ";
 		$input*=2;
@@ -52,7 +52,7 @@ $wp->run(new SerializableWorkerClosure(
 
 echo "starting closure 4..\n";
 $wp->run(new SerializableWorkerClosure(
-	function($input, $semaphore, $storage) use ($z) {
+	function($input, $storage) use ($z) {
 		sleep(2);
 		echo "$input: $z ";
 		$input+=10;

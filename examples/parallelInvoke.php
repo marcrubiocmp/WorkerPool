@@ -118,7 +118,7 @@ $words = CreateWordArray('darwin.txt');
 //$words = CreateWordArray('http://www.gutenberg.org/files/2009/2009.txt');
 
 $wp->run(new SerializableWorkerClosure(
-	function($words, $semaphore, $storage) {
+	function($words, $storage) {
 		echo "Begin Task Count Words\n";
 		echo sprintf("Task Count Words -- We have %d words\n", count($words));
 	},
@@ -126,7 +126,7 @@ $wp->run(new SerializableWorkerClosure(
 ));
 
 $wp->run(new SerializableWorkerClosure(
-	function($words, $semaphore, $storage) {
+	function($words, $storage) {
 		echo "Begin Task Longest Word\n";
 		\ParallelTasks\GetLongestWord($words);
 	},
@@ -134,7 +134,7 @@ $wp->run(new SerializableWorkerClosure(
 ));
 
 $wp->run(new SerializableWorkerClosure(
-	function($words, $semaphore, $storage) {
+	function($words, $storage) {
 		echo "Begin Task Most Common Words\n";
                 \ParallelTasks\GetMostCommonWords($words);
 	},
@@ -142,7 +142,7 @@ $wp->run(new SerializableWorkerClosure(
 ));
 
 $wp->run(new SerializableWorkerClosure(
-	function($words, $semaphore, $storage) {
+	function($words, $storage) {
 		echo "Begin Task Count For Word\n";
 		\ParallelTasks\GetCountForWord($words, "species");
 	},
