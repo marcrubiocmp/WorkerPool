@@ -5,23 +5,17 @@ require_once(__DIR__ . '/../autoload.php');
 
 use QXS\WorkerPool\WorkerPool;
 use QXS\WorkerPool\WorkerInterface;
-use QXS\WorkerPool\Semaphore;
-
 
 /**
  * Our Worker Class
  */
 Class MyWorker implements WorkerInterface {
-        protected $sem;
         /**
          * after the worker has been forked into another process
          *
-         * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to run synchronized tasks
          * @throws \Exception in case of a processing Error an Exception will be thrown
          */
-        public function onProcessCreate(Semaphore $semaphore) {
-                // semaphore can be used in the run method to synchronize the workers
-                $this->sem=$semaphore;
+        public function onProcessCreate() {
                 // write something to the stdout
                 echo "\t[".getmypid()."] has been created.\n";
                 // initialize mt_rand

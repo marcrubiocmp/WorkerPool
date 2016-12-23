@@ -12,10 +12,9 @@ $wp->setWorkerPoolSize(100)
 	->create(new \QXS\WorkerPool\ClosureWorker(
 		/**
 		 * @param mixed $input the input from the WorkerPool::run() Method
-		 * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to synchronize calls accross all workers
 		 * @param \ArrayObject $storage a persistent storge for the current child process
 		 */
-			function ($input, $semaphore, $storage) {
+			function ($input, $storage) {
 				usleep(rand(1000000,2000000)); // this is the working load!
 				return NULL;
 			}

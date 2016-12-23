@@ -3,7 +3,6 @@
 namespace QXS\Tests\WorkerPool;
 
 use QXS\WorkerPool\ClosureWorker;
-use QXS\WorkerPool\Semaphore;
 
 /**
  * @requires extension pcntl
@@ -14,31 +13,27 @@ use QXS\WorkerPool\Semaphore;
 class ClosureWorkerTest extends \PHPUnit_Framework_TestCase {
 
 	public function testClosureMethods() {
-		$semaphore = new Semaphore();
 		$that = $this;
 		$createRun = FALSE;
 		$runRun = FALSE;
 		$destroyRun = FALSE;
 		$worker = new ClosureWorker(
-			function ($input, $semaphore, $storage) use ($that, &$runRun) {
+			function ($input, $storage) use ($that, &$runRun) {
 				$runRun = TRUE;
-				$that->assertInstanceOf('QXS\WorkerPool\Semaphore', $semaphore);
 				$that->assertInstanceOf('ArrayObject', $storage);
 				return $input;
 			},
-			function ($semaphore, $storage) use ($that, &$createRun) {
+			function ($storage) use ($that, &$createRun) {
 				$createRun = TRUE;
-				$that->assertInstanceOf('QXS\WorkerPool\Semaphore', $semaphore);
 				$that->assertInstanceOf('ArrayObject', $storage);
 			},
-			function ($semaphore, $storage) use ($that, &$destroyRun) {
+			function ($storage) use ($that, &$destroyRun) {
 				$destroyRun = TRUE;
-				$that->assertInstanceOf('QXS\WorkerPool\Semaphore', $semaphore);
 				$that->assertInstanceOf('ArrayObject', $storage);
 			}
 		);
 
-		$worker->onProcessCreate($semaphore);
+		$worker->onProcessCreate();
 		$this->assertTrue(
 			$createRun,
 			'Worker::onProcessCreate should call the create Closure.'

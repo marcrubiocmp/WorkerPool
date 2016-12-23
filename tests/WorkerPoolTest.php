@@ -30,30 +30,6 @@ class WorkerPoolTest extends \PHPUnit_Framework_TestCase {
 		$this->sut = new WorkerPool();
 	}
 
-	public function testFatalFailingWorker() {
-		$this->markTestSkipped('Failing workers get respawned now.');
-		$exceptionMsg = NULL;
-		$exception = NULL;
-		$wp = new WorkerPool();
-		$wp->setWorkerPoolSize(10);
-		$wp->create(new Fixtures\FatalFailingWorker());
-		try {
-			for ($i = 0; $i < 20; $i++) {
-				$wp->run($i);
-			}
-		} catch (\Exception $e) {
-			$exceptionMsg = $e->getMessage();
-			$exception = $e;
-		}
-		$this->assertInstanceOf('QXS\WorkerPool\WorkerPoolException', $exception);
-		$this->assertEquals(
-			'Unable to run the task.',
-			$exceptionMsg,
-			'We have a wrong Exception Message.'
-		);
-		$wp->destroy();
-	}
-
 	public function testGetters() {
 		$wp = new WorkerPool();
 		$wp->create(new Fixtures\PingWorker());

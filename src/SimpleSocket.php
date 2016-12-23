@@ -63,7 +63,7 @@ class SimpleSocket {
 		$writeSockets = self::createSocketsIndex($writeSockets, $writeSocketsResources);
 		$exceptSockets = self::createSocketsIndex($exceptSockets, $exceptSocketsResources);
 
-		$socketsSelected = socket_select($readSocketsResources, $writeSocketsResources, $exceptSocketsResources, $sec, $usec);
+		$socketsSelected = @socket_select($readSocketsResources, $writeSocketsResources, $exceptSocketsResources, $sec, $usec);
 		if ($socketsSelected === FALSE) {
 			return $out;
 		}

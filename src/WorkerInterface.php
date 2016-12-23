@@ -13,10 +13,9 @@ interface WorkerInterface {
 	/**
 	 * After the worker has been forked into another process
 	 *
-	 * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to run synchronized tasks
 	 * @throws \Exception in case of a processing Error an Exception will be thrown
 	 */
-	public function onProcessCreate(Semaphore $semaphore);
+	public function onProcessCreate();
 
 	/**
 	 * Before the worker process is getting destroyed

@@ -41,9 +41,6 @@ class WorkerPool implements \Iterator, \Countable {
 	/** @var \QXS\WorkerPool\WorkerInterface the worker class, that is used to run the tasks */
 	protected $worker;
 
-	/** @var \QXS\WorkerPool\Semaphore the semaphore, that is used to synchronizd tasks across all processes */
-	protected $semaphore;
-
 	/** @var ProcessDetailsCollection|ProcessDetails[] Collection of the worker processes */
 	protected $workerProcesses;
 
@@ -167,32 +164,6 @@ class WorkerPool implements \Iterator, \Countable {
 	}
 
 	/**
-	 * Gets the Semaphore, that will be used within the worker processes
-	 * @return null|\QXS\WorkerPool\Semaphore $semaphore the Semaphore, that should be used for the workers
-	 */
-	public function getSemaphore() {
-		return $this->semaphore;
-	}
-
-	/**
-	 * Sets the Semaphore, that will be used within the worker processes
-	 * @param \QXS\WorkerPool\Semaphore $semaphore the Semaphore, that should be used for the workers
-	 * @return WorkerPool
-	 * @throws \QXS\WorkerPool\WorkerPoolException in case the WorkerPool has already been created
-	 * @throws \InvalidArgumentException in case the semaphre hasn't been created
-	 */
-	public function setSemaphore(Semaphore $semaphore) {
-		if ($this->created) {
-			throw new WorkerPoolException('Cannot set the Worker Pool Size for a created pool.');
-		}
-		if (!$semaphore->isCreated()) {
-			throw new \InvalidArgumentException('The Semaphore hasn\'t yet been created.');
-		}
-		$this->semaphore = $semaphore;
-		return $this;
-	}
-
-	/**
 	 * Terminates the current process
 	 * @param int $code the exit code
 	 */
@@ -225,15 +196,6 @@ class WorkerPool implements \Iterator, \Countable {
 		// when adding signals use pcntl_signal_dispatch(); or declare ticks
 		foreach ($this->signals as $signo) {
 			pcntl_signal($signo, array($this, 'signalHandler'));
-		}
-
-		// no Semaphore attached? -> create one
-		if (!($this->semaphore instanceof Semaphore)) {
-			$this->semaphore = new Semaphore();
-			$this->semaphore->create(Semaphore::SEM_RAND_KEY);
-		}
-		elseif(!$this->semaphore->isCreated()) {
-			$this->semaphore->create(Semaphore::SEM_RAND_KEY);
 		}
 
 		ProcessDetails::setProcessTitle(
@@ -289,7 +251,7 @@ class WorkerPool implements \Iterator, \Countable {
 			'state' => 'free'
 		);
 		ProcessDetails::setProcessTitle($this->childProcessTitleFormat, $replacements);
-		$this->worker->onProcessCreate($this->semaphore);
+		$this->worker->onProcessCreate();
 		while (TRUE) {
 			$output = array('pid' => getmypid());
 			try {
@@ -334,7 +296,7 @@ class WorkerPool implements \Iterator, \Countable {
 	}
 
 	/**
-	 * This runs on shutdown to prevent the system from semaphore leaks
+	 * This runs on shutdown to prevent the system from leaks
 	 */
 	public function onShutDown() {
 		// are we in the parent?
@@ -389,8 +351,6 @@ class WorkerPool implements \Iterator, \Countable {
 			usleep(500000); // 0.5 seconds
 			// reap the remaining signals
 			$this->reaper();
-			// destroy the semaphore
-			$this->semaphore->destroy();
 
 			unset($this->workerProcesses);
 		}

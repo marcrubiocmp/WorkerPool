@@ -22,9 +22,6 @@ class ClosureWorker implements WorkerInterface {
 	/** @var \ArrayObject persistent storage container for the working process */
 	protected $storage;
 
-	/** @var \QXS\WorkerPool\Semaphore $semaphore the semaphore to run synchronized tasks */
-	protected $semaphore;
-
 	/**
 	 * The constructor
 	 * @param \Closure $run Closure that runs the task
@@ -34,10 +31,10 @@ class ClosureWorker implements WorkerInterface {
 	public function __construct(\Closure $run, \Closure $create = NULL, \Closure $destroy = NULL) {
 		$this->storage = new \ArrayObject();
 		if(is_null($create)) {
-			$create=function($semaphore, $storage) { };
+			$create=function($storage) { };
 		}
 		if(is_null($destroy)) {
-			$destroy=function($semaphore, $storage) { };
+			$destroy=function($storage) { };
 		}
 		$this->create = $create;
 		$this->run = $run;
@@ -47,12 +44,10 @@ class ClosureWorker implements WorkerInterface {
 	/**
 	 * After the worker has been forked into another process
 	 *
-	 * @param \QXS\WorkerPool\Semaphore $semaphore the semaphore to run synchronized tasks
 	 * @throws \Exception in case of a processing Error an Exception will be thrown
 	 */
-	public function onProcessCreate(Semaphore $semaphore) {
-		$this->semaphore = $semaphore;
-		$this->create->__invoke($this->semaphore, $this->storage);
+	public function onProcessCreate() {
+		$this->create->__invoke($this->storage);
 	}
 
 	/**
@@ -61,7 +56,7 @@ class ClosureWorker implements WorkerInterface {
 	 * @throws \Exception in case of a processing Error an Exception will be thrown
 	 */
 	public function onProcessDestroy() {
-		$this->destroy->__invoke($this->semaphore, $this->storage);
+		$this->destroy->__invoke($this->storage);
 	}
 
 	/**
@@ -72,7 +67,7 @@ class ClosureWorker implements WorkerInterface {
 	 * @throws \Exception in case of a processing Error an Exception will be thrown
 	 */
 	public function run($input) {
-		return $this->run->__invoke($input, $this->semaphore, $this->storage);
+		return $this->run->__invoke($input, $this->storage);
 	}
 }
 

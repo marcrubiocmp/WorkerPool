@@ -1,12 +1,11 @@
 <?php
 namespace QXS\Tests\WorkerPool\Fixtures;
 
-use QXS\WorkerPool\Semaphore;
 use QXS\WorkerPool\WorkerInterface;
 
 Class PingWorker implements WorkerInterface {
 
-	public function onProcessCreate(Semaphore $semaphore) {
+	public function onProcessCreate() {
 	}
 
 	public function onProcessDestroy() {
